@@ -16,7 +16,6 @@ export const uploadToDisk = async (req, res) => {
 // };
 
 export const uploadToCloudinary = async (req, res) => {
-  console.log("in cloudinary");
   if (!req.file) {
     return sendResponse(res, "No file uploaded", 400);
   }

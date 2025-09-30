@@ -6,28 +6,31 @@
   "main": "server.js",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js"
+    "start": "node server.js",
+    "build": "npm install --no-optional"
+  },
+  "engines": {
+    "node": ">=18.x"
   },
   "author": "Srikanth Kamalla",
   "license": "ISC",
   "dependencies": {
-    "@vercel/node": "^5.3.13",
-    "bcrypt": "^6.0.0",
+    "bcrypt": "^5.1.1",
     "cloudinary": "^2.7.0",
     "cors": "^2.8.5",
-    "dotenv": "^17.2.1",
-    "express": "^5.1.0",
-    "express-session": "^1.18.2",
+    "dotenv": "^16.4.5",
+    "express": "^4.18.2",
+    "express-session": "^1.18.0",
     "jsonwebtoken": "^9.0.2",
-    "mongodb": "^6.18.0",
-    "mongoose": "^8.16.5",
-    "multer": "^2.0.2",
-    "node-cron": "^4.2.1",
-    "nodemailer": "^7.0.5",
+    "mongodb": "^6.8.0",
+    "mongoose": "^8.7.2",
+    "multer": "^1.4.5-lts.1",
+    "node-cron": "^3.0.3",
+    "nodemailer": "^6.9.16",
     "passport": "^0.7.0",
     "passport-google-oauth20": "^2.0.0"
   },
   "devDependencies": {
-    "nodemon": "^3.1.10"
+    "nodemon": "^3.1.7"
   }
 }
