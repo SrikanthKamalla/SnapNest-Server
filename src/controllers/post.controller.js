@@ -40,6 +40,7 @@ export const uploadToCloudinary = async (req, res) => {
 export const createPost = async (req, res) => {
   try {
     const { text, image, imageId, isScheduled, scheduledTime } = req.body;
+    console.log(imageId);
     const newPost = await new Post({
       text,
       image,
@@ -55,9 +56,45 @@ export const createPost = async (req, res) => {
   }
 };
 
+export const createPostWithImage = async (req, res) => {
+  if (!req.file) {
+    return sendResponse(res, "No file uploaded", 400);
+  }
+
+  try {
+    const uploadedDetails = await cloudinaryjs.uploader.upload(req.file.path, {
+      folder: "posts",
+    });
+
+    const { secure_url: image, public_id: imageId } = uploadedDetails;
+
+    fs.unlink(req.file.path, (err) => {
+      if (err) console.error("Error deleting local file:", err);
+      else console.log("Local file deleted:", req.file.path);
+    });
+
+    const { text, isScheduled, scheduledTime } = req.body;
+
+    const newPost = new Post({
+      text,
+      image,
+      imageId,
+      user: req.user.id,
+      isScheduled,
+      scheduledTime,
+    });
+
+    const savedPost = await newPost.save();
+
+    sendResponse(res, "Post created successfully", 200, { savedPost });
+  } catch (error) {
+    sendResponse(res, error.message, 500);
+  }
+};
+
 export const editPost = async (req, res) => {
   try {
-    const { text, image, imageId } = req.body;
+    const { text } = req.body;
     const { id } = req.params;
 
     if (!text) {
@@ -65,32 +102,21 @@ export const editPost = async (req, res) => {
     }
 
     const foundPost = await Post.findById(id);
-
     if (!foundPost) {
-      return sendResponse(res, "Post not found", 400);
+      return sendResponse(res, "Post not found", 404);
     }
 
-    if (foundPost.user.toString() !== req.user.id) {
-      return sendResponse(res, "User not authorized to edit post", 400);
+    if (foundPost.user.toString() !== req.user.id.toString()) {
+      return sendResponse(res, "User not authorized to edit post", 403);
     }
 
-    if (image && foundPost.imageId) {
-      try {
-        await cloudinary.v2.uploader.destroy(foundPost.imageId);
-      } catch (err) {
-        console.error("Cloudinary deletion failed:", err);
-      }
-      foundPost.image = image;
-      foundPost.imageId = imageId;
-    }
-
-    if (text) foundPost.text = text;
+    foundPost.text = text;
 
     await foundPost.save();
 
     sendResponse(res, "Post updated successfully", 200, { post: foundPost });
   } catch (error) {
-    sendResponse(res, error.message, 404);
+    sendResponse(res, error.message, 500);
   }
 };
 
@@ -103,7 +129,7 @@ export const deletePost = async (req, res) => {
       return sendResponse(res, "Post not found", 400);
     }
 
-    if (foundPost.user.toString() !== req.user.id) {
+    if (foundPost.user.toString() !== req.user.id.toString()) {
       return sendResponse(res, "User not authorized to delete post", 400);
     }
 

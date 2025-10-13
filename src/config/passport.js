@@ -31,7 +31,6 @@ const verifyCb = async (accessToken, refreshToken, profile, done) => {
 
     done(null, user);
   } catch (error) {
-    console.error("Google Auth Error:", error);
     done(error, null);
   }
 };

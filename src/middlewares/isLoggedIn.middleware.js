@@ -26,7 +26,6 @@ const isLoggedIn = async (req, res, next) => {
 
     next();
   } catch (error) {
-    console.log(error);
     return sendResponse(res, "Invalid or expired token", 401);
   }
 };

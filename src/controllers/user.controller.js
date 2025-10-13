@@ -5,7 +5,6 @@ import User from "../models/user.model.js";
 import sendResponse from "../utils/response.util.js";
 
 export const signup = async (req, res) => {
-  console.log("signup");
   const { name, email, password, role } = req.body;
   const isExists = await User.findOne({ email, isInActive: false });
   if (isExists) {

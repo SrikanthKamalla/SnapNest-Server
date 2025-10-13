@@ -13,6 +13,7 @@ import {
   dislikePost,
   postStatsById,
   getFeeds,
+  createPostWithImage,
 } from "../controllers/post.controller.js";
 import upload from "../config/multer.js";
 import isLoggedIn from "../middlewares/isLoggedIn.middleware.js";
@@ -23,7 +24,15 @@ const router = express.Router();
 // router.post("/upload/disk-multi", upload.array("images"), uploadToDiskMultiple);
 
 router.post("/upload", upload.single("image"), uploadToCloudinary);
-router.post("/createpost", isLoggedIn, createPost);
+// router.post("/createpost", isLoggedIn, createPost);
+
+// Route
+router.post(
+  "/createPost",
+  isLoggedIn,
+  upload.single("image"),
+  createPostWithImage
+);
 
 router.put("/editPost/:id", isLoggedIn, editPost);
 router.delete("/deletePost/:id", isLoggedIn, deletePost);
