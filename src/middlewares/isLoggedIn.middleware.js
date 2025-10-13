@@ -1,7 +1,6 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import sendResponse from "../utils/response.util.js";
-import redisClient from "../config/redisClient.js";
 
 const isLoggedIn = async (req, res, next) => {
   try {
@@ -15,19 +14,9 @@ const isLoggedIn = async (req, res, next) => {
 
     let decodedUser = jwt.verify(token, secret);
 
-    let cachedUser = await redisClient.get(decodedUser.id);
-    let user;
+    let user = await User.findById(decodedUser.id).select("-password");
 
-    if (!cachedUser) {
-      user = await User.findById(decodedUser.id).select("-password");
-      if (!user) return sendResponse(res, "User not found", 404);
-
-      await redisClient.setEx(decodedUser.id, 60, JSON.stringify(user));
-      console.log("fetching from db");
-    } else {
-      console.log("fetching from redis cache");
-      user = JSON.parse(cachedUser);
-    }
+    if (!user) return sendResponse(res, "User not found", 404);
 
     req.user = {
       id: user._id,
