@@ -1,7 +1,9 @@
 import jwt from "jsonwebtoken";
 import User from "../models/user.model.js";
 import sendResponse from "../utils/response.util.js";
+import NodeCache from "node-cache";
 
+const myCache = new NodeCache({ stdTTL: 60 * 10, checkperiod: 100 });
 const isLoggedIn = async (req, res, next) => {
   try {
     const authHeader = req.headers.authorization;
@@ -13,10 +15,12 @@ const isLoggedIn = async (req, res, next) => {
     const secret = process.env.SECRET_KEY;
 
     let decodedUser = jwt.verify(token, secret);
-
-    let user = await User.findById(decodedUser.id).select("-password");
-
-    if (!user) return sendResponse(res, "User not found", 404);
+    let user = myCache.get(decodedUser.id);
+    if (!user) {
+      user = await User.findById(decodedUser.id).select("-password");
+      if (!user) return sendResponse(res, "User not found", 404);
+      myCache.set(decodedUser.id, user);
+    }
 
     req.user = {
       id: user._id,
