@@ -13,9 +13,7 @@ const strategyOptions = {
 const verifyCb = async (accessToken, refreshToken, profile, done) => {
   try {
     let user = await User.findOne({ email: profile.emails[0].value });
-
     if (!user) {
-      // generate a dummy password for OAuth users
       const salt = await bcrypt.genSalt(10);
       const randomPassword = crypto.randomBytes(20).toString("hex");
       const hashedPassword = await bcrypt.hash(randomPassword, salt);
