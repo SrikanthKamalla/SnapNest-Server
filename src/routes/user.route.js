@@ -57,12 +57,12 @@ router.get(
         { expiresIn: "7d" }
       );
 
-      const redirectUrl = `http://localhost:5173/google-success?token=${token}`;
+      const redirectUrl = `${process.env.CLIENT_APP_URL}/google-success?token=${token}`;
 
       return res.redirect(redirectUrl);
     } catch (error) {
       return res.redirect(
-        "http://localhost:5173/login?error=something_went_wrong"
+        `${process.env.CLIENT_APP_URL}/login?error=something_went_wrong`
       );
     }
   }
