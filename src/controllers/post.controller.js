@@ -168,11 +168,20 @@ export const getPostById = async (req, res) => {
 };
 
 export const getLoggedInUserPosts = async (req, res) => {
+  let { page = 1, limit = 4 } = req.query; 
+
+  page = parseInt(page);
+  limit = parseInt(limit);
   try {
+    const skip = (page - 1) * limit;
     const foundPosts = await Post.find({
       user: req.user.id,
       isScheduled: false,
-    }).populate("user", "name");
+    })
+      .populate("user", "name")
+      .skip(skip)
+      .limit(limit);
+
     sendResponse(res, "All Posts Fetched Successfully!", 200, {
       posts: foundPosts || [],
     });
@@ -181,11 +190,23 @@ export const getLoggedInUserPosts = async (req, res) => {
   }
 };
 export const getAllPosts = async (req, res) => {
+  let { page = 1, limit = 4 } = req.query;
+
+  page = parseInt(page);
+  limit = parseInt(limit);
+
   try {
-    const foundPosts = await Post.find({ isScheduled: false }).populate(
-      "user",
-      "name"
-    );
+    
+    const skip = (page - 1) * limit;
+
+    const foundPosts = await Post.find({ isScheduled: false })
+      .sort({ createdAt: -1 })
+      .populate("user", "name")
+      .skip(skip)
+      .limit(limit);
+
+    console.log(foundPosts);
+
     sendResponse(res, "Post Fetched Successfully!", 200, {
       posts: foundPosts || [],
     });
